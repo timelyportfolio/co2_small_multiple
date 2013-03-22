@@ -162,18 +162,22 @@ SmallMults = () ->
     # switch the css on which divs are hidden
     toggleHidden(true)
     
-    detailView = d3.select("#detail_view")
+    detailView = d3.select("#detail_panel")
 
     # clear any existing detail view
-    detailView.selectAll('.main').remove()
+    detailView.selectAll('svg').remove()
 
     # bind the single element to be detailed to the 
     # detail view's group
-    detailG = detailView.selectAll('g').data([d]).enter()
+    detailG = detailView.selectAll('svg').data([d,data[data.length-1]]).enter()
 
     # create a new group to display the graph in
-    main = detailG.append("g")
-      .attr("class", "main")
+    main = detailG.append("svg")
+        .attr("width", width * scaleFactor / 2 )
+        .attr("height", height * scaleFactor / 2 )
+            .append("g")
+            .attr("class", "main")
+            
 
     # draw graph just like in the initial creation
     # of the small multiples
@@ -208,7 +212,7 @@ SmallMults = () ->
     main.transition()
       .delay(500)
       .duration(500)
-      .attr('transform', "translate(#{40},#{0}) scale(#{scaleFactor})")
+      .attr('transform', "translate(#{40},#{0}) scale(#{scaleFactor/2.2})")
 
   # ---
   # This function shrinks the detail view back from whence it came
@@ -223,7 +227,7 @@ SmallMults = () ->
     # The view also shrinks back to its preview size
     # because d3's transition can tween between the 
     # scale it had, and the lack of scale here.
-    d3.selectAll('#detail_view .main').transition()
+    d3.selectAll('#detail_panel svg').transition()
       .duration(500)
       .attr('transform', "translate(#{pos.left},#{pos.top - scrollTop})")
       .each 'end', () ->
