@@ -268,26 +268,31 @@ SmallMults = () ->
   # Serves as example of simple additional interactions
   # in detail view
   # ---
-  showAnnotation = (d) ->
-    graph = d3.select("#detail_panel .main")
-    graph.select(".subtitle").remove()
+  showAnnotation = (d,i) ->
+    d3.selectAll(".main").selectAll(".subtitle").remove()
+    
+    makesubtitle = (a) ->
+      graph = d3.select("#detail" + a)
 
-    graph.selectAll(".subtitle")
-      .data([d]).enter()
-      .append("text")
-      .text("#{formatNumber(d.percent_world * 100)}% of Worldwide Emissions")
-      .attr("class", "subtitle")
-      .attr("fill", (d) -> colorScale(d.name))
-      .attr("text-anchor", "middle")
-      .attr("dy", "3.8em")
-      .attr("x", (d) -> graphWidth / 2)
-      .attr("font-size", 8)
+      g = data.filter((e) -> e.year==Number(d3.select("#detail" + a +  " .title").text()))[0].values.filter((f) -> f.code==d.code)[0]
+
+      graph.selectAll(".subtitle").data([g]).enter()
+        .append("text")
+        .text("#{formatNumber(g.percent_world * 100)}% of Worldwide Emissions")
+        .attr("class", "subtitle")
+        .attr("fill", (d) -> colorScale(d.name))
+        .attr("text-anchor", "middle")
+        .attr("dy", "3.8em")
+        .attr("x", (d) -> graphWidth / 2)
+        .attr("font-size", 8)
+  
+    makesubtitle a for a in [0,1]
 
   # ---
   # remove subtitle
   # ---
   hideAnnotation = (d) ->
-    graph = d3.select("#detail_panel .main")
+    graph = d3.selectAll("#detail_panel .main")
     graph.selectAll(".subtitle").remove()
 
   # ---
