@@ -173,10 +173,12 @@ SmallMults = () ->
 
     # create a new group to display the graph in
     main = detailG.append("svg")
-        .attr("width", width * scaleFactor / 2 )
-        .attr("height", height * scaleFactor / 2 )
+        .attr("width", 800 )
+        .attr("height", 800 )
             .append("g")
             .attr("class", "main")
+            .attr("id",(d,i) -> "detail"+i)
+            .style('opacity',0)
             
 
     # draw graph just like in the initial creation
@@ -206,13 +208,26 @@ SmallMults = () ->
 
     # first we move our (small) detail graph to be positioned over
     # its preview version
-    main.attr('transform', "translate(#{pos.left},#{pos.top - scrollTop})")
+    d3.select("#detail0")
+        .attr('transform', "translate(#{pos.left},#{pos.top - scrollTop})")
+        .style('opacity',100)
+
     # then we use a transition to center the detailed graph and scale it
     # up to be bigger
     main.transition()
       .delay(500)
       .duration(500)
       .attr('transform', "translate(#{40},#{0}) scale(#{scaleFactor/2.2})")
+
+    detailView.selectAll('svg').transition()
+        .delay(1000)
+        .attr("width", width * scaleFactor / 2 )
+        .attr("height", height * scaleFactor / 2 )
+
+    main.transition()
+        .delay(1200)
+        .style('opacity',100)
+
 
   # ---
   # This function shrinks the detail view back from whence it came
@@ -222,12 +237,18 @@ SmallMults = () ->
     pos = getPosition(i)
     scrollTop = $(window).scrollTop()
 
+    d3.selectAll('#detail1').style("opacity",0)
+
+    d3.select("#detail_panel").selectAll('svg')
+        .attr("width", 800 )
+        .attr("height", 800 )
+   
     # Use transition to move the detail panel back 
     # down to its preview's location
     # The view also shrinks back to its preview size
     # because d3's transition can tween between the 
     # scale it had, and the lack of scale here.
-    d3.selectAll('#detail_panel svg').transition()
+    d3.selectAll('#detail0').transition()
       .duration(500)
       .attr('transform', "translate(#{pos.left},#{pos.top - scrollTop})")
       .each 'end', () ->
@@ -248,8 +269,8 @@ SmallMults = () ->
   # in detail view
   # ---
   showAnnotation = (d) ->
-    graph = d3.select("#detail_view .main")
-    graph.selectAll(".subtitle").remove()
+    graph = d3.select("#detail_panel .main")
+    graph.select(".subtitle").remove()
 
     graph.selectAll(".subtitle")
       .data([d]).enter()
@@ -266,7 +287,7 @@ SmallMults = () ->
   # remove subtitle
   # ---
   hideAnnotation = (d) ->
-    graph = d3.select("#detail_view .main")
+    graph = d3.select("#detail_panel .main")
     graph.selectAll(".subtitle").remove()
 
   # ---
